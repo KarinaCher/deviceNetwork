@@ -1,22 +1,35 @@
-package app;
+package controller;
 
 import exception.DuplicateDeviceException;
 import exception.InitializationException;
 import exception.ParentNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.test.context.junit4.SpringRunner;
 
-import static device.DeviceType.*;
+import static entity.DeviceType.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+@RunWith(SpringRunner.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootApplication
+@EntityScan(basePackages = "entity")
+@EnableJpaRepositories(basePackages = "repository")
 public class NetworkControllerTest {
 
+    @Autowired
     private NetworkController networkController;
 
     @BeforeEach
     public void setUp() {
-        networkController = new NetworkController();
+        networkController.getRepository().deleteAll();
     }
 
     @Test
@@ -73,7 +86,7 @@ public class NetworkControllerTest {
         networkController.register(GATEWAY, "MAC", null);
         networkController.register(GATEWAY, "MAC11", "MAC");
         networkController.register(GATEWAY, "MAC12", "MAC");
-        networkController.register(GATEWAY, "MAC2", "MAC11");
+        networkController.register(GATEWAY, "MAC111", "MAC11");
 
         assertEquals("MAC", networkController.getTopology("MAC").getMacAddress());
         assertEquals("MAC", networkController.getTopology("MAC").getMacAddress());
